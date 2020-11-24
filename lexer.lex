@@ -122,12 +122,43 @@ enum {
 %}
 
  /* TODO Helper definitions here  */
+digit					[0-9]
+integer				{{digit}+}
+slash 				[/]
+star					[*]
+
+comment_op		{slash} + {star}						//
+comment_cl		{star} + {slash}						//
+comment			{comment_op}|{comment_cl}	//
+
+operator			[-+*/]
+separator			[;,/(){}]
+letter   				[A-Za-z]
+
+
 
 %%
 
  /* TODO Implement the rest... */
 
 class                   return CLASS;
+public				   return  PUBLIC;
+if					       return IF;
+else 					   return ELSE;
+
+
+
+float 							{ yylval.str = strdup(yytext); return TYPE; }			//place before IDENTIFIERs rules
+
+
+center				   		{ yylval.str = strdup(yytext); return IDENTIFIER; }
+constructor		   		{ yylval.str = strdup(yytext); return IDENTIFIER; }
+radius				   		{ yylval.str = strdup(yytext); return IDENTIFIER; }
+Sphere  		       		{ yylval.str = strdup(yytext); return IDENTIFIER; }
+[a-zA-Z][a-zA-Z0-9]* 	{ yylval.str = strdup(yytext); return IDENTIFIER; }
+
+
+{operator}|{separator}  {return (int)yytext[0];}
 
 .                       { yylval.str = strdup(yytext); return ERROR; }
 
@@ -182,8 +213,11 @@ int main(int argc, char **argv) {
                         printf("%s [%f]\n", name, yylval.fval);
                         break;
                     case TYPE:
+						printf("%s [%s]\n", name, yylval.str);
                     case STATE:
                     case IDENTIFIER:
+						printf("%s [%s]\n", name, yylval.str);
+                        break;
                     case ERROR:
                         printf("%s [%s]\n", name, yylval.str);
                         free(yylval.str);
